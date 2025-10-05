@@ -9,7 +9,6 @@ import aiohttp
 import blivedm
 import blivedm.models.web as web_models
 
-# 直播间ID的取值看直播间URL
 TEST_ROOM_IDS = [
     1908321388,
 ]
@@ -40,7 +39,6 @@ def init_session():
 
 
 async def run_single_client():
-    """演示监听一个直播间"""
     room_id = random.choice(TEST_ROOM_IDS)
     client = blivedm.BLiveClient(room_id, session=session)
     handler = MyHandler()
@@ -48,7 +46,6 @@ async def run_single_client():
 
     client.start()
     try:
-        # 演示5秒后停止
         await asyncio.sleep(5)
         client.stop()
 
@@ -58,7 +55,6 @@ async def run_single_client():
 
 
 async def run_multi_clients():
-    """演示同时监听多个直播间"""
     clients = [blivedm.BLiveClient(room_id, session=session) for room_id in TEST_ROOM_IDS]
     handler = MyHandler()
     for client in clients:
@@ -76,15 +72,14 @@ async def run_multi_clients():
 
 
 class MyHandler(blivedm.BaseHandler):
-    # 演示如何添加自定义回调
     _CMD_CALLBACK_DICT = blivedm.BaseHandler._CMD_CALLBACK_DICT.copy()
 
     # 处理用户互动消息（包括进入房间、关注等）
     def _on_interact_word_v2(self, client: blivedm.BLiveClient, message: web_models.InteractWordV2Message):
-        # msg_type == 1 表示用户进入直播间
+        # 用户进入直播间
         if message.msg_type == 1:
             print(f'[{client.room_id}] 用户进入房间 - 用户名: {message.username}, 用户ID: {message.uid}')
-        # msg_type == 2 表示用户关注直播间
+        # 用户关注直播间
         elif message.msg_type == 2:
             print(f'[{client.room_id}] 用户关注直播间 - 用户名: {message.username}, 用户ID: {message.uid}')
     _CMD_CALLBACK_DICT['INTERACT_WORD'] = _on_interact_word_v2  # 注册回调
